@@ -3,7 +3,7 @@ name: Greetings
 on:
   push:
     branches:
-      - bxie
+      - bxie4
 
 jobs:
   test:
