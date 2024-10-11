@@ -13,19 +13,47 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up SSH
+      - name: Install Docker
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ccb.tbc.iit.edu >> ~/.ssh/known_hosts
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
 
-      - name: Copy repository to cluster
-        run: |
-          scp -r . bxie4@ccb.tbc.iit.edu:/home/bxie4/github/test
+      # TODO: Build Docker image based on the latest code and dependencies
+#      - name: Build Docker image
+#        run: |
+#          docker build -t THIS_WILL_BE_A_DOCKER_IMAGE:${{ github.sha }} .
 
-      - name: Run tests on remote cluster
-        run: |
-          ssh bxie4@ccb.tbc.iit.edu "
-            cd ~/.ssh/known_hosts && 
-            python AlGDock/BindingPMF.py"
+      # TODO: Run test in Docker
+#      - name: Run tests in Docker
+#        run: |
+#          docker run THIS_WILL_BE_A_DOCKER_IMAGE:${{ github.sha }} python BPMF.py
+
+
+      # TODO: To achieve above step,
+      # 1. Create a Dockerfile
+      # 2. Setup docker to copy the latest code from repo into the image during the build
+
+      #------------------------------------
+#      # Use the Miniconda base image
+#      FROM continuumio/miniconda3
+#
+#      # Set the working directory in the container
+#      WORKDIR /app
+#
+#      # Copy your environment.yml (for Conda) into the image
+#      COPY environment.yml /app/
+#
+#      # Install the Conda environment
+#      RUN conda env create -f environment.yml
+#
+#      # Ensure the conda environment is activated by default
+#      RUN echo "source activate myenv" >> ~/.bashrc
+#      ENV PATH /opt/conda/envs/myenv/bin:$PATH
+#
+#      # Copy the latest code from the repo into the image
+#      COPY . /app
+#
+#      # Set the default command to run the app/script
+#      CMD ["bash", "-c", "source activate myenv && python test.py"]
