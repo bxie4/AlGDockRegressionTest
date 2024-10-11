@@ -8,12 +8,24 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      pull-requests: write
+
     steps:
-    - uses: actions/first-interaction@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: "Message that will be displayed on users' first issue"
-        pr-message: "Message that will be displayed on users' first pull request"
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H bxie4@ccb.tbc.iit.edu >> ~/.ssh/known_hosts
+
+      - name: Copy repository to cluster
+        run: |
+          scp -r . bxie4@ccb.tbc.iit.edu:/home/bxie4/github/test
+
+      - name: Run tests on remote cluster
+        run: |
+          ssh bxie4@ccb.tbc.iit.edu "
+            cd ~/.ssh/known_hosts && 
+            python AlGDock/BindingPMF.py"
